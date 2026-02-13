@@ -1,0 +1,38 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Claude Code
+.claude/
+
+# Mac / Windows
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Data files (optional - remove if you want to track small datasets)
+#data/
+#*.csv
+
+# Large files
+*.zip
+*.tar
+*.gz
+
+# Environment variables
+.env

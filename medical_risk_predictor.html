@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medical Risk Pre-Screening</title>
+<style>
+  /* ── Reset & base ──────────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue-dark  : #1a3a5c;
+    --blue-mid   : #2563a8;
+    --blue-light : #e8f0fb;
+    --border     : #d1daea;
+    --text-main  : #1e2a3a;
+    --text-muted : #5f6b7c;
+    --radius     : 10px;
+    --shadow     : 0 4px 24px rgba(30,42,58,.10);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, #e8f0fb 0%, #f4f7fb 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32px 16px 64px;
+    color: var(--text-main);
+  }
+
+  /* ── Card shell ────────────────────────────────────────────────────────── */
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 720px;
+    overflow: hidden;
+  }
+
+  /* ── Header ────────────────────────────────────────────────────────────── */
+  .card-header {
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+    color: #fff;
+    padding: 28px 32px 24px;
+  }
+  .card-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .card-header .logo svg {
+    flex-shrink: 0;
+    opacity: .92;
+  }
+  .card-header h1 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+  }
+  .card-header p {
+    font-size: .88rem;
+    opacity: .8;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 20px;
+    font-size: .75rem;
+    padding: 3px 10px;
+    margin-top: 10px;
+    letter-spacing: .03em;
+  }
+
+  /* ── Body ──────────────────────────────────────────────────────────────── */
+  .card-body { padding: 28px 32px 32px; }
+
+  .section-label {
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--blue-mid);
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--blue-light);
+  }
+
+  /* ── Form grid ─────────────────────────────────────────────────────────── */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 540px) {
+    .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  /* ── Field ─────────────────────────────────────────────────────────────── */
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label {
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .field label .req {
+    color: #e53e3e;
+    font-size: .85em;
+    line-height: 1;
+  }
+  .field label .unit {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: .78em;
+  }
+  .field input {
+    height: 42px;
+    padding: 0 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: .93rem;
+    color: var(--text-main);
+    background: #fafbfd;
+    transition: border-color .15s, box-shadow .15s;
+    outline: none;
+  }
+  .field input:focus {
+    border-color: var(--blue-mid);
+    box-shadow: 0 0 0 3px rgba(37,99,168,.12);
+    background: #fff;
+  }
+  .field input.required-field {
+    border-color: #a3bfe0;
+    background: var(--blue-light);
+  }
+  .field .hint {
+    font-size: .73rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+  }
+
+  /* ── Divider ───────────────────────────────────────────────────────────── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 22px 0;
+  }
+
+  /* ── Submit ────────────────────────────────────────────────────────────── */
+  .btn-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 52px;
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    letter-spacing: .02em;
+    margin-top: 20px;
+  }
+  .btn-submit:hover { opacity: .92; transform: translateY(-1px); }
+  .btn-submit:active { transform: translateY(0); opacity: 1; }
+  .btn-submit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+  /* ── Result box ────────────────────────────────────────────────────────── */
+  #result {
+    display: none;
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-top: 24px;
+    border: 2px solid transparent;
+    animation: fadeIn .35s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:none } }
+
+  /* Risk colour themes */
+  #result.low    { background:#f0faf2; border-color:#48bb78; }
+  #result.medium { background:#fffbeb; border-color:#ed8936; }
+  #result.high   { background:#fff5f5; border-color:#e53e3e; }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .risk-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.55rem;
+    flex-shrink: 0;
+  }
+  .low    .risk-icon { background: #c6f6d5; }
+  .medium .risk-icon { background: #feebc8; }
+  .high   .risk-icon { background: #fed7d7; }
+
+  .result-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .low    .result-title { color: #276749; }
+  .medium .result-title { color: #7b341e; }
+  .high   .result-title { color: #9b2c2c; }
+
+  .result-subtitle {
+    font-size: .83rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* Confidence bar */
+  .conf-label {
+    font-size: .78rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .conf-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: #e2e8f0;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .conf-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width .6s cubic-bezier(.4,0,.2,1);
+  }
+  .low    .conf-fill { background: #48bb78; }
+  .medium .conf-fill { background: #ed8936; }
+  .high   .conf-fill { background: #e53e3e; }
+
+  /* Probability chips */
+  .prob-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .prob-chip {
+    font-size: .75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1.5px solid;
+  }
+  .prob-chip.low    { background:#f0faf2; border-color:#48bb78; color:#276749; }
+  .prob-chip.medium { background:#fffbeb; border-color:#ed8936; color:#7b341e; }
+  .prob-chip.high   { background:#fff5f5; border-color:#e53e3e; color:#9b2c2c; }
+
+  .disclaimer {
+    font-size: .73rem;
+    color: var(--text-muted);
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    line-height: 1.5;
+  }
+
+  /* ── Spinner ───────────────────────────────────────────────────────────── */
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2.5px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg) } }
+
+  /* ── Error toast ───────────────────────────────────────────────────────── */
+  #error-toast {
+    display: none;
+    background: #fff5f5;
+    border: 1.5px solid #e53e3e;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-top: 16px;
+    font-size: .85rem;
+    color: #9b2c2c;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <div class="card-header">
+    <div class="logo">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="10" fill="rgba(255,255,255,.15)"/>
+        <path d="M20 8a12 12 0 1 0 0 24A12 12 0 0 0 20 8zm0 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20z" fill="white" opacity=".6"/>
+        <path d="M20 13v7l4.5 2.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M17 18h6M20 15v6" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1>Medical Risk Pre-Screening</h1>
+        <p>KNN-powered health risk assessment — for educational purposes only</p>
+      </div>
+    </div>
+    <span class="badge">KNN Model &nbsp;·&nbsp; Tuned via GridSearchCV &nbsp;·&nbsp; Part 5A</span>
+  </div>
+
+  <!-- ── Body ────────────────────────────────────────────────────────────── -->
+  <div class="card-body">
+    <form id="riskForm" novalidate>
+
+      <!-- Primary fields (mandatory) -->
+      <div class="section-label">Primary Indicators <span style="color:#e53e3e;font-size:.8em">* required</span></div>
+      <div class="grid-3">
+
+        <div class="field">
+          <label>BMI <span class="req">*</span> <span class="unit">kg/m²</span></label>
+          <input type="number" id="bmi" name="BMI" class="required-field"
+                 placeholder="e.g. 27.5" step="0.1" min="10" max="70" required>
+          <span class="hint">Normal: 18.5–24.9</span>
+        </div>
+
+        <div class="field">
+          <label>Age <span class="req">*</span> <span class="unit">years</span></label>
+          <input type="number" id="age" name="Age" class="required-field"
+                 placeholder="e.g. 35" step="1" min="1" max="120" required>
+          <span class="hint">Patient age</span>
+        </div>
+
+        <div class="field">
+          <label>Blood Pressure <span class="req">*</span> <span class="unit">mm Hg</span></label>
+          <input type="number" id="bp" name="BloodPressure" class="required-field"
+                 placeholder="e.g. 72" step="1" min="20" max="200" required>
+          <span class="hint">Diastolic. Normal: 60–80</span>
+        </div>
+
+      </div>
+
+      <hr class="divider">
+
+      <!-- Secondary fields (optional) -->
+      <div class="section-label">Additional Clinical Measurements <span style="color:var(--text-muted);font-size:.85em;text-transform:none;letter-spacing:0;font-weight:400">(optional — defaults to population median)</span></div>
+      <div class="grid-2">
+
+        <div class="field">
+          <label>Glucose <span class="unit">mg/dL</span></label>
+          <input type="number" id="glucose" name="Glucose"
+                 placeholder="e.g. 117  (median)" step="1" min="0" max="300">
+          <span class="hint">Plasma glucose (2h OGTT). Pre-diabetic: &gt;100</span>
+        </div>
+
+        <div class="field">
+          <label>Insulin <span class="unit">µU/mL</span></label>
+          <input type="number" id="insulin" name="Insulin"
+                 placeholder="e.g. 30  (median)" step="1" min="0" max="900">
+          <span class="hint">2-hour serum insulin</span>
+        </div>
+
+        <div class="field">
+          <label>Skin Thickness <span class="unit">mm</span></label>
+          <input type="number" id="skin" name="SkinThickness"
+                 placeholder="e.g. 23  (median)" step="1" min="0" max="100">
+          <span class="hint">Triceps skinfold thickness</span>
+        </div>
+
+        <div class="field">
+          <label>Pregnancies <span class="unit">count</span></label>
+          <input type="number" id="preg" name="Pregnancies"
+                 placeholder="e.g. 3  (median)" step="1" min="0" max="20">
+          <span class="hint">Number of pregnancies (0 if not applicable)</span>
+        </div>
+
+      </div>
+
+      <div class="grid-2" style="margin-top:10px">
+        <div class="field">
+          <label>Diabetes Pedigree <span class="unit">score</span></label>
+          <input type="number" id="pedigree" name="DiabetesPedigreeFunction"
+                 placeholder="e.g. 0.37  (median)" step="0.001" min="0" max="3">
+          <span class="hint">Hereditary diabetes risk function</span>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <svg id="submitIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <div class="spinner" id="spinner"></div>
+        <span id="submitText">Assess Risk</span>
+      </button>
+
+    </form>
+
+    <!-- Error toast -->
+    <div id="error-toast"></div>
+
+    <!-- Result box -->
+    <div id="result" role="alert">
+      <div class="result-header">
+        <div class="risk-icon" id="riskIcon"></div>
+        <div>
+          <div class="result-title" id="riskTitle"></div>
+          <div class="result-subtitle" id="riskSubtitle"></div>
+        </div>
+      </div>
+      <div class="conf-label">
+        <span>Model confidence</span>
+        <span id="confPct"></span>
+      </div>
+      <div class="conf-bar"><div class="conf-fill" id="confFill"></div></div>
+      <div class="prob-row" id="probRow"></div>
+      <p class="disclaimer">
+        ⚠️ This tool is for <strong>educational demonstration only</strong> and must
+        not be used for clinical decision-making. Always consult a qualified
+        healthcare professional for medical advice.
+      </p>
+    </div>
+
+  </div><!-- /card-body -->
+</div><!-- /card -->
+
+<script>
+const PREDICT_URL = "http://localhost:8765/predict";
+
+const RISK_CONFIG = {
+  Low    : { emoji:"✅", title:"Low Risk", bg:"low",
+              subtitle:"Patient metrics are within healthy ranges.", },
+  Medium : { emoji:"⚠️", title:"Medium Risk", bg:"medium",
+              subtitle:"Some indicators are elevated. Consider follow-up." },
+  High   : { emoji:"🔴", title:"High Risk", bg:"high",
+              subtitle:"Multiple elevated indicators. Prompt clinical review advised." },
+};
+
+document.getElementById("riskForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  // ── Validate mandatory fields ──────────────────────────────────────────
+  const bmi = document.getElementById("bmi").value.trim();
+  const age = document.getElementById("age").value.trim();
+  const bp  = document.getElementById("bp").value.trim();
+
+  if (!bmi || !age || !bp) {
+    showError("Please fill in all required fields: BMI, Age, and Blood Pressure.");
+    return;
+  }
+
+  hideError();
+  setLoading(true);
+
+  // ── Build payload — only include filled optional fields ────────────────
+  const payload = { BMI: bmi, Age: age, BloodPressure: bp };
+  const optionals = ["Glucose","Insulin","SkinThickness","Pregnancies","DiabetesPedigreeFunction"];
+  optionals.forEach(id => {
+    const fieldId = {
+      "Glucose":"glucose","Insulin":"insulin","SkinThickness":"skin",
+      "Pregnancies":"preg","DiabetesPedigreeFunction":"pedigree"
+    }[id];
+    const val = document.getElementById(fieldId).value.trim();
+    if (val !== "") payload[id] = val;
+  });
+
+  try {
+    const response = await fetch(PREDICT_URL, {
+      method : "POST",
+      headers: { "Content-Type": "application/json" },
+      body   : JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || `Server error ${response.status}`);
+    }
+
+    const data = await response.json();
+    renderResult(data);
+
+  } catch (err) {
+    if (err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
+      showError(
+        "Cannot reach the prediction server.\n" +
+        "Make sure the notebook cell that starts start_prediction_server() has been run."
+      );
+    } else {
+      showError("Prediction failed: " + err.message);
+    }
+  } finally {
+    setLoading(false);
+  }
+});
+
+function renderResult(data) {
+  const cfg    = RISK_CONFIG[data.risk] || RISK_CONFIG.Medium;
+  const result = document.getElementById("result");
+
+  result.className = cfg.bg;
+  document.getElementById("riskIcon").textContent    = cfg.emoji;
+  document.getElementById("riskTitle").textContent   = cfg.title;
+  document.getElementById("riskSubtitle").textContent = cfg.subtitle;
+
+  const pct = Math.round(data.confidence * 100);
+  document.getElementById("confPct").textContent  = pct + "%";
+  document.getElementById("confFill").style.width = pct + "%";
+
+  // Per-class probability chips
+  const row = document.getElementById("probRow");
+  row.innerHTML = "";
+  const classMap = { Low:"low", Medium:"medium", High:"high" };
+  Object.entries(data.class_probs || {}).forEach(([cls, prob]) => {
+    const chip = document.createElement("span");
+    chip.className = "prob-chip " + (classMap[cls] || "medium");
+    chip.textContent = cls + ": " + Math.round(prob * 100) + "%";
+    row.appendChild(chip);
+  });
+
+  result.style.display = "block";
+  result.scrollIntoView({ behavior:"smooth", block:"nearest" });
+}
+
+function setLoading(on) {
+  const btn  = document.getElementById("submitBtn");
+  const icon = document.getElementById("submitIcon");
+  const spin = document.getElementById("spinner");
+  const txt  = document.getElementById("submitText");
+  btn.disabled      = on;
+  icon.style.display = on ? "none" : "block";
+  spin.style.display = on ? "block" : "none";
+  txt.textContent    = on ? "Analysing…" : "Assess Risk";
+}
+
+function showError(msg) {
+  const t = document.getElementById("error-toast");
+  t.textContent    = "⚠️ " + msg;
+  t.style.display  = "block";
+  document.getElementById("result").style.display = "none";
+}
+function hideError() {
+  document.getElementById("error-toast").style.display = "none";
+}
+</script>
+</body>
+</html>
